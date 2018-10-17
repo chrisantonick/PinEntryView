@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+println VERSION_CODE
 android {
     compileSdkVersion Integer.parseInt(ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
@@ -21,8 +22,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.3.0'
+//    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    compile 'com.android.support:appcompat-v7:23.3.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
 }
 
 def isReleaseBuild() {
