@@ -233,6 +233,7 @@ public class PinEntryView extends ViewGroup {
             // Show keyboard
             InputMethodManager inputMethodManager = (InputMethodManager) getContext()
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (inputMethodManager == null) return true;
             inputMethodManager.showSoftInput(editText, 0);
             return true;
         }
@@ -506,28 +507,6 @@ public class PinEntryView extends ViewGroup {
 
         public DigitView(Context context) {
             this(context, null);
-            this.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "clicked...");
-                    if (getParent() instanceof PinEntryView) {
-                        PinEntryView parent = (PinEntryView) getParent();
-                        if (parent != null) {
-                            parent.requestFocus();
-                            int idx = parent.indexOfChild(DigitView.this);
-                            if (idx < 0) return;
-                            int digits = parent.getChildCount() - 1;
-                            if (digits < 1) return;
-                            Log.d(TAG, String.format(Locale.US, "clicked %d, digits %d", idx, digits));
-                            if (idx < digits - 1) {
-                                parent.clearText();//TODO: clear only this item and those after it
-                            } else {
-                                Log.d(TAG, "clicked last item");
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         public DigitView(Context context, AttributeSet attrs) {
@@ -541,6 +520,26 @@ public class PinEntryView extends ViewGroup {
             paint = new Paint();
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(accentColor);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            Log.d(TAG, "clicked...");
+            if (getParent() != null && getParent() instanceof PinEntryView) {
+                PinEntryView parent = (PinEntryView) getParent();
+                int idx = parent.indexOfChild(DigitView.this);
+                if (idx < 0) return true;
+                int digits = parent.getChildCount() - 1;
+                if (digits < 1) return true;
+                Log.d(TAG, String.format(Locale.US, "clicked %d, digits %d", idx, digits));
+                if (idx < digits - 1) {
+                    parent.clearText();//TODO: clear only this item and those after it
+                } else {
+                    Log.d(TAG, "clicked last item");
+                }
+                return parent.onTouchEvent(event);
+            }
+            return super.onTouchEvent(event);
         }
 
         @Override protected void onDraw(Canvas canvas) {
