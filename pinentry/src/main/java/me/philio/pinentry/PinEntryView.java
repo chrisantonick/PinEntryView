@@ -24,12 +24,14 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -40,11 +42,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 /**
  * A PIN entry view widget for Android based on the Android 5 Material Theme via the AppCompat v7
  * support library.
  */
 public class PinEntryView extends ViewGroup {
+    private static final String TAG = PinEntryView.class.getSimpleName();
 
     /**
      * Accent types
@@ -117,6 +122,8 @@ public class PinEntryView extends ViewGroup {
 
     public PinEntryView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        Log.d(TAG, "PinEntryView");
 
         // Get style information
         TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.PinEntryView);
@@ -378,6 +385,8 @@ public class PinEntryView extends ViewGroup {
      * Create views and add them to the view group
      */
     private void addViews() {
+        Log.d(TAG, "addViews");
+
         // Add a digit view for each digit
         for (int i = 0; i < digits; i++) {
             DigitView digitView = new DigitView(getContext());
@@ -488,7 +497,7 @@ public class PinEntryView extends ViewGroup {
     /**
      * Custom text view that adds a coloured accent when selected
      */
-    private class DigitView extends TextView {
+    private class DigitView extends AppCompatTextView {
 
         /**
          * Paint used to draw accent
@@ -497,6 +506,28 @@ public class PinEntryView extends ViewGroup {
 
         public DigitView(Context context) {
             this(context, null);
+            this.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "clicked...");
+                    if (getParent() instanceof PinEntryView) {
+                        PinEntryView parent = (PinEntryView) getParent();
+                        if (parent != null) {
+                            parent.requestFocus();
+                            int idx = parent.indexOfChild(DigitView.this);
+                            if (idx < 0) return;
+                            int digits = parent.getChildCount() - 1;
+                            if (digits < 1) return;
+                            Log.d(TAG, String.format(Locale.US, "clicked %d, digits %d", idx, digits));
+                            if (idx < digits - 1) {
+                                parent.clearText();//TODO: clear only this item and those after it
+                            } else {
+                                Log.d(TAG, "clicked last item");
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         public DigitView(Context context, AttributeSet attrs) {

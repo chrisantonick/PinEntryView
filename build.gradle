@@ -3,10 +3,10 @@ task wrapper(type: Wrapper) {
     distributionType 'ALL'
 }
 
-
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
@@ -17,5 +17,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
+        google()
     }
 }
